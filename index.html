@@ -574,11 +574,173 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    <!-- Password Protection Screen -->
+    <div id="passwordScreen" style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    ">
+        <div style="
+            background: white;
+            border-radius: 20px;
+            padding: 30px 25px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+        ">
+            <div style="
+                width: 60px;
+                height: 60px;
+                background: linear-gradient(135deg, #667eea, #764ba2);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto 20px;
+            ">
+                <i class="fas fa-lock" style="color: white; font-size: 24px;"></i>
+            </div>
+            
+            <h2 style="
+                font-size: 24px;
+                font-weight: 700;
+                color: #1e293b;
+                margin: 0 0 10px 0;
+            ">Access Code Required</h2>
+            
+            <p style="
+                color: #64748b;
+                margin: 0 0 25px 0;
+                font-size: 14px;
+            ">Enter the 4-digit code to continue</p>
+            
+            <div id="passwordInput" style="
+                display: flex;
+                gap: 10px;
+                justify-content: center;
+                margin-bottom: 25px;
+            ">
+                <input type="tel" maxlength="1" class="pin-input" id="pin1" style="
+                    width: 50px;
+                    height: 60px;
+                    border: 2px solid #e2e8f0;
+                    border-radius: 12px;
+                    text-align: center;
+                    font-size: 24px;
+                    font-weight: 700;
+                    outline: none;
+                    transition: all 0.3s;
+                " />
+                <input type="tel" maxlength="1" class="pin-input" id="pin2" style="
+                    width: 50px;
+                    height: 60px;
+                    border: 2px solid #e2e8f0;
+                    border-radius: 12px;
+                    text-align: center;
+                    font-size: 24px;
+                    font-weight: 700;
+                    outline: none;
+                    transition: all 0.3s;
+                " />
+                <input type="tel" maxlength="1" class="pin-input" id="pin3" style="
+                    width: 50px;
+                    height: 60px;
+                    border: 2px solid #e2e8f0;
+                    border-radius: 12px;
+                    text-align: center;
+                    font-size: 24px;
+                    font-weight: 700;
+                    outline: none;
+                    transition: all 0.3s;
+                " />
+                <input type="tel" maxlength="1" class="pin-input" id="pin4" style="
+                    width: 50px;
+                    height: 60px;
+                    border: 2px solid #e2e8f0;
+                    border-radius: 12px;
+                    text-align: center;
+                    font-size: 24px;
+                    font-weight: 700;
+                    outline: none;
+                    transition: all 0.3s;
+                " />
+            </div>
+            
+            <button id="unlockBtn" onclick="checkPassword()" style="
+                background: linear-gradient(135deg, #667eea, #764ba2);
+                color: white;
+                border: none;
+                border-radius: 12px;
+                padding: 16px 32px;
+                font-size: 16px;
+                font-weight: 600;
+                cursor: pointer;
+                width: 100%;
+                transition: all 0.3s;
+            ">
+                <i class="fas fa-unlock"></i> Unlock
+            </button>
+            
+            <div style="
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                margin-top: 15px;
+            ">
+                <input type="checkbox" id="rememberMe" style="
+                    width: 18px;
+                    height: 18px;
+                    cursor: pointer;
+                ">
+                <label for="rememberMe" style="
+                    color: #64748b;
+                    font-size: 14px;
+                    cursor: pointer;
+                    user-select: none;
+                ">Remember for 30 days</label>
+            </div>
+            
+            <div id="errorMsg" style="
+                color: #ef4444;
+                margin-top: 15px;
+                font-size: 14px;
+                display: none;
+            ">
+                <i class="fas fa-exclamation-circle"></i> Incorrect code. Try again.
+            </div>
+        </div>
+    </div>
+
+    <div class="container" id="mainContainer" style="display: none;">
         <!-- Compact Mobile Header -->
         <div class="header">
             <h1>🔍 Universal Search</h1>
             <p>All research tools in one place</p>
+            <button onclick="logout()" style="
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                background: rgba(255,255,255,0.2);
+                color: white;
+                border: 1px solid rgba(255,255,255,0.3);
+                border-radius: 8px;
+                padding: 8px 12px;
+                font-size: 12px;
+                cursor: pointer;
+                transition: all 0.3s;
+            ">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
         </div>
 
         <!-- Mobile-First Search Card -->
@@ -790,7 +952,6 @@
             <p>Built with ❤️ for efficient research | <a href="#" onclick="showHelp()">Help</a> | <a href="#" onclick="showAbout()">About</a></p>
         </div>
     </div>
-
     <!-- Mobile-Optimized Modal -->
     <div class="modal" id="taxModal">
         <div class="modal-content">
@@ -817,6 +978,199 @@
     <div class="swipe-hint" id="swipeHint">Swipe down to close</div>
 
     <script>
+        // Password Protection System
+        const CORRECT_PASSWORD = '1206';
+        
+        // Check if already authenticated
+        window.addEventListener('DOMContentLoaded', function() {
+            // Check localStorage for remembered authentication
+            const remembered = localStorage.getItem('searchToolAuth');
+            const authExpiry = localStorage.getItem('searchToolAuthExpiry');
+            
+            if (remembered === 'true' && authExpiry) {
+                const expiryDate = new Date(authExpiry);
+                const now = new Date();
+                
+                if (now < expiryDate) {
+                    // Still within remember period
+                    showMainContent();
+                    return;
+                } else {
+                    // Expired, clear auth
+                    localStorage.removeItem('searchToolAuth');
+                    localStorage.removeItem('searchToolAuthExpiry');
+                }
+            }
+            
+            // Check session authentication
+            if (sessionStorage.getItem('authenticated') === 'true') {
+                showMainContent();
+            } else {
+                // Setup password input system
+                setupPasswordInput();
+            }
+        });
+        
+        function showMainContent() {
+            document.getElementById('passwordScreen').style.display = 'none';
+            document.getElementById('mainContainer').style.display = 'block';
+            init(); // Initialize the main app
+        }
+        
+        function logout() {
+            // Clear all authentication
+            sessionStorage.removeItem('authenticated');
+            localStorage.removeItem('searchToolAuth');
+            localStorage.removeItem('searchToolAuthExpiry');
+            
+            // Reload page to show password screen
+            location.reload();
+        }
+
+        function setupPasswordInput() {
+            const inputs = document.querySelectorAll('.pin-input');
+            
+            // Auto-focus first input
+            inputs[0].focus();
+            
+            // Handle input and auto-advance
+            inputs.forEach((input, index) => {
+                input.addEventListener('input', function(e) {
+                    // Only allow numbers
+                    this.value = this.value.replace(/[^0-9]/g, '');
+                    
+                    // Auto-advance to next input
+                    if (this.value && index < inputs.length - 1) {
+                        inputs[index + 1].focus();
+                    }
+                    
+                    // Check password when last digit entered
+                    if (index === inputs.length - 1 && this.value) {
+                        checkPassword();
+                    }
+                    
+                    // Update input style
+                    if (this.value) {
+                        this.style.borderColor = '#667eea';
+                        this.style.background = 'linear-gradient(135deg, #f0f4ff, #f8fafc)';
+                    }
+                });
+                
+                // Handle backspace
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Backspace' && !this.value && index > 0) {
+                        inputs[index - 1].focus();
+                    }
+                });
+                
+                // Handle paste
+                input.addEventListener('paste', function(e) {
+                    e.preventDefault();
+                    const pastedData = e.clipboardData.getData('text').slice(0, 4);
+                    const digits = pastedData.split('');
+                    
+                    digits.forEach((digit, i) => {
+                        if (i < inputs.length && /\d/.test(digit)) {
+                            inputs[i].value = digit;
+                            if (i === inputs.length - 1) {
+                                setTimeout(checkPassword, 100);
+                            }
+                        }
+                    });
+                });
+                
+                // Visual feedback on focus
+                input.addEventListener('focus', function() {
+                    this.style.borderColor = '#667eea';
+                    this.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.1)';
+                });
+                
+                input.addEventListener('blur', function() {
+                    if (!this.value) {
+                        this.style.borderColor = '#e2e8f0';
+                        this.style.boxShadow = 'none';
+                    }
+                });
+            });
+        }
+
+        function checkPassword() {
+            const inputs = document.querySelectorAll('.pin-input');
+            const enteredPassword = Array.from(inputs).map(input => input.value).join('');
+            const rememberMe = document.getElementById('rememberMe').checked;
+            
+            if (enteredPassword === CORRECT_PASSWORD) {
+                // Correct password
+                vibrate(50);
+                
+                // Show success animation
+                document.getElementById('unlockBtn').innerHTML = '<i class="fas fa-check"></i> Success!';
+                document.getElementById('unlockBtn').style.background = 'linear-gradient(135deg, #10b981, #059669)';
+                
+                // Store authentication
+                sessionStorage.setItem('authenticated', 'true');
+                
+                // Handle remember me
+                if (rememberMe) {
+                    localStorage.setItem('searchToolAuth', 'true');
+                    const expiryDate = new Date();
+                    expiryDate.setDate(expiryDate.getDate() + 30); // 30 days from now
+                    localStorage.setItem('searchToolAuthExpiry', expiryDate.toISOString());
+                }
+                
+                // Fade out password screen and show main content
+                setTimeout(() => {
+                    document.getElementById('passwordScreen').style.transition = 'opacity 0.5s';
+                    document.getElementById('passwordScreen').style.opacity = '0';
+                    
+                    setTimeout(() => {
+                        showMainContent();
+                    }, 500);
+                }, 500);
+            } else {
+                // Wrong password
+                vibrate([50, 50, 50]);
+                
+                // Show error
+                document.getElementById('errorMsg').style.display = 'block';
+                
+                // Shake animation
+                const container = document.querySelector('#passwordScreen > div');
+                container.style.animation = 'shake 0.5s';
+                
+                // Clear inputs
+                inputs.forEach(input => {
+                    input.value = '';
+                    input.style.borderColor = '#ef4444';
+                    input.style.background = '#fef2f2';
+                });
+                
+                // Focus first input
+                inputs[0].focus();
+                
+                // Reset after animation
+                setTimeout(() => {
+                    container.style.animation = '';
+                    inputs.forEach(input => {
+                        input.style.borderColor = '#e2e8f0';
+                        input.style.background = 'white';
+                    });
+                    document.getElementById('errorMsg').style.display = 'none';
+                }, 500);
+            }
+        }
+
+        // Add shake animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-10px); }
+                75% { transform: translateX(10px); }
+            }
+        `;
+        document.head.appendChild(style);
+
         // Mobile-optimized search configurations
         let searchMode = 'web';
         const modeMeta = {
@@ -1472,9 +1826,6 @@ A powerful multi-mode search tool designed for mobile efficiency.
 
 Built for professional research.`);
         }
-
-        // Initialize on load
-        window.addEventListener('DOMContentLoaded', init);
 
         // Handle escape key and back button
         document.addEventListener('keydown', (e) => {
