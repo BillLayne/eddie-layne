@@ -585,7 +585,7 @@
         <div class="search-card">
             <div class="pull-handle"></div>
             
-            <!-- Mode Selector - 2 rows of 3 -->
+            <!-- Mode Selector - 2 rows of 4 now -->
             <div class="mode-selector" id="modeBar">
                 <button class="mode-btn touchable active" data-mode="web">
                     <i class="fab fa-google"></i>
@@ -610,6 +610,14 @@
                 <button class="mode-btn touchable" data-mode="facebook">
                     <i class="fab fa-facebook"></i>
                     <span>Facebook</span>
+                </button>
+                <button class="mode-btn touchable" data-mode="news">
+                    <i class="fas fa-globe-americas"></i>
+                    <span>News</span>
+                </button>
+                <button class="mode-btn touchable" data-mode="finance">
+                    <i class="fas fa-dollar-sign"></i>
+                    <span>Finance</span>
                 </button>
             </div>
 
@@ -671,6 +679,88 @@
                         <i class="fab fa-linkedin"></i>
                         <span>LinkedIn</span>
                     </button>
+                    <a href="https://gemini.google.com/app" 
+                       target="_blank" 
+                       class="quick-btn touchable">
+                        <i class="fas fa-magic"></i>
+                        <span>Gemini AI</span>
+                    </a>
+                    <a href="https://www.foxnews.com" 
+                       target="_blank" 
+                       class="quick-btn touchable">
+                        <i class="fas fa-newspaper"></i>
+                        <span>Fox News</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Finance & Real Estate Tools -->
+            <div class="quick-actions" style="margin-top: 15px;">
+                <div class="quick-actions-title">Finance & Real Estate</div>
+                <div class="quick-action-grid">
+                    <button class="quick-btn touchable" onclick="openFinanceTool('calculator')">
+                        <i class="fas fa-calculator"></i>
+                        <span>Mortgage</span>
+                    </button>
+                    <button class="quick-btn touchable" onclick="openFinanceTool('redfin')">
+                        <i class="fas fa-building"></i>
+                        <span>Redfin</span>
+                    </button>
+                    <button class="quick-btn touchable" onclick="openFinanceTool('marketwatch')">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>MarketWatch</span>
+                    </button>
+                    <button class="quick-btn touchable" onclick="openFinanceTool('rates')">
+                        <i class="fas fa-percentage"></i>
+                        <span>Rates</span>
+                    </button>
+                    <button class="quick-btn touchable" onclick="openFinanceTool('realtor')">
+                        <i class="fas fa-house-user"></i>
+                        <span>Realtor.com</span>
+                    </button>
+                    <button class="quick-btn touchable" onclick="openFinanceTool('crypto')">
+                        <i class="fab fa-bitcoin"></i>
+                        <span>Crypto</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- News & Research Section -->
+            <div class="quick-actions" style="margin-top: 15px;">
+                <div class="quick-actions-title">News & Research</div>
+                <div class="quick-action-grid">
+                    <a href="https://www.bloomberg.com/" 
+                       target="_blank" 
+                       class="quick-btn touchable">
+                        <i class="fas fa-chart-area"></i>
+                        <span>Bloomberg</span>
+                    </a>
+                    <a href="https://www.wsj.com/" 
+                       target="_blank" 
+                       class="quick-btn touchable">
+                        <i class="fas fa-newspaper"></i>
+                        <span>WSJ</span>
+                    </a>
+                    <a href="https://www.cnbc.com/" 
+                       target="_blank" 
+                       class="quick-btn touchable">
+                        <i class="fas fa-tv"></i>
+                        <span>CNBC</span>
+                    </a>
+                    <a href="https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm" 
+                       target="_blank" 
+                       class="quick-btn touchable">
+                        <i class="fas fa-university"></i>
+                        <span>Fed Rates</span>
+                    </a>
+                    <button class="quick-btn touchable" onclick="multiPropertySearch()">
+                        <i class="fas fa-home"></i>
+                        <span>Multi RE</span>
+                    </button>
+                    <button class="quick-btn touchable" onclick="marketResearch()">
+                        <i class="fas fa-briefcase"></i>
+                        <span>Market</span>
+                    </button>
                 </div>
             </div>
 
@@ -685,7 +775,7 @@
                     <div class="stat-label">Saved</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value" id="modeCount">6</div>
+                    <div class="stat-value" id="modeCount">8</div>
                     <div class="stat-label">Modes</div>
                 </div>
                 <div class="stat-card">
@@ -758,6 +848,16 @@
             facebook: { 
                 placeholder: 'Search Facebook...', 
                 icon: 'fab fa-facebook',
+                showTax: false 
+            },
+            news: { 
+                placeholder: 'Search news topics...', 
+                icon: 'fas fa-globe-americas',
+                showTax: false 
+            },
+            finance: { 
+                placeholder: 'Company or financial topic...', 
+                icon: 'fas fa-dollar-sign',
                 showTax: false 
             }
         };
@@ -953,6 +1053,21 @@
                 case 'facebook':
                     url = `https://www.facebook.com/search/top?q=${encodeURIComponent(query)}`;
                     break;
+                case 'news':
+                    // Search multiple news sources
+                    const newsSites = [
+                        `https://www.foxnews.com/search-results/search?q=${encodeURIComponent(query)}`,
+                        `https://news.google.com/search?q=${encodeURIComponent(query)}`,
+                        `https://www.cnn.com/search?q=${encodeURIComponent(query)}`
+                    ];
+                    newsSites.forEach(site => window.open(site, '_blank'));
+                    updateSearchCount(newsSites.length - 1); // -1 because we'll add 1 later
+                    document.getElementById('searchInput').value = '';
+                    vibrate(50);
+                    return; // Exit early since we opened multiple tabs
+                case 'finance':
+                    url = `https://www.bloomberg.com/search?query=${encodeURIComponent(query)}`;
+                    break;
             }
 
             if (url) {
@@ -1102,6 +1217,107 @@
             vibrate(20);
         }
 
+        // Finance and Real Estate Tools
+        function openFinanceTool(tool) {
+            vibrate(15);
+            const query = document.getElementById('searchInput').value.trim();
+            let url = '';
+            
+            switch(tool) {
+                case 'calculator':
+                    url = 'https://www.bankrate.com/mortgages/mortgage-calculator/';
+                    break;
+                case 'redfin':
+                    if (query) {
+                        url = `https://www.redfin.com/stingray/do/query-location?query=${encodeURIComponent(query)}&v=2`;
+                    } else {
+                        url = 'https://www.redfin.com/';
+                    }
+                    break;
+                case 'marketwatch':
+                    if (query) {
+                        url = `https://www.marketwatch.com/investing/stock/${encodeURIComponent(query.toUpperCase())}`;
+                    } else {
+                        url = 'https://www.marketwatch.com/';
+                    }
+                    break;
+                case 'rates':
+                    url = 'https://www.bankrate.com/mortgages/current-interest-rates/';
+                    break;
+                case 'realtor':
+                    if (query) {
+                        url = `https://www.realtor.com/realestateandhomes-search/${encodeURIComponent(query.replace(/\s+/g, '_'))}`;
+                    } else {
+                        url = 'https://www.realtor.com/';
+                    }
+                    break;
+                case 'crypto':
+                    if (query) {
+                        url = `https://www.coinbase.com/price/${encodeURIComponent(query.toLowerCase())}`;
+                    } else {
+                        url = 'https://www.coinbase.com/price';
+                    }
+                    break;
+            }
+            
+            if (url) {
+                window.open(url, '_blank');
+                updateSearchCount();
+                if (query) {
+                    saveToHistory(`finance-${tool}`, query);
+                }
+            }
+        }
+
+        // Enhanced multi-search for finance/real estate
+        function multiPropertySearch() {
+            const query = document.getElementById('searchInput').value.trim();
+            if (!query) {
+                vibrate([50, 50, 50]);
+                alert('Enter an address to search multiple sites');
+                return;
+            }
+            
+            const sites = [
+                `https://www.zillow.com/homes/${encodeURIComponent(query)}_rb/`,
+                `https://www.redfin.com/stingray/do/query-location?query=${encodeURIComponent(query)}&v=2`,
+                `https://www.realtor.com/realestateandhomes-search/${encodeURIComponent(query.replace(/\s+/g, '_'))}`,
+                `https://www.trulia.com/for_sale/${encodeURIComponent(query)}/`
+            ];
+            
+            sites.forEach(url => window.open(url, '_blank'));
+            updateSearchCount(sites.length);
+            vibrate([20, 50, 20]);
+        }
+
+        // Market research function
+        function marketResearch() {
+            const query = document.getElementById('searchInput').value.trim();
+            
+            if (!query) {
+                // Open general market overview
+                const sites = [
+                    'https://www.marketwatch.com/',
+                    'https://www.bloomberg.com/markets',
+                    'https://finance.yahoo.com/',
+                    'https://www.cnbc.com/markets/'
+                ];
+                sites.forEach(url => window.open(url, '_blank'));
+            } else {
+                // Search for specific stock/topic
+                const sites = [
+                    `https://finance.yahoo.com/quote/${encodeURIComponent(query.toUpperCase())}`,
+                    `https://www.marketwatch.com/investing/stock/${encodeURIComponent(query.toUpperCase())}`,
+                    `https://www.bloomberg.com/quote/${encodeURIComponent(query.toUpperCase())}:US`,
+                    `https://seekingalpha.com/symbol/${encodeURIComponent(query.toUpperCase())}`
+                ];
+                sites.forEach(url => window.open(url, '_blank'));
+            }
+            
+            updateSearchCount(4);
+            vibrate([20, 50, 20]);
+        }
+
         // Save search
         function saveSearch() {
             const query = document.getElementById('searchInput').value.trim();
@@ -1213,26 +1429,39 @@
 
         // Mobile-friendly help
         function showHelp() {
-            alert(`Universal Search Tool
+            alert(`Universal Search Tool - Enhanced
 
-Search Modes:
+SEARCH MODES (8):
 • Web - Google search
 • Real Estate - Zillow + Tax GIS
 • People - TruePeopleSearch
 • Records - Public property records
 • Stocks - Yahoo Finance
 • Facebook - Social search
+• News - Multi-source news
+• Finance - Bloomberg search
 
-Quick Tools:
+QUICK TOOLS:
 • AI Property - Perplexity research
+• Gemini AI - Google's AI image creator
+• Fox News - Latest news
 • FB People - Facebook people search
 • Multi-Tab - Open multiple searches
 • LinkedIn - Professional search
 
-Tips:
+FINANCE & REAL ESTATE:
+• Mortgage Calculator
+• Redfin, Realtor.com property search
+• MarketWatch, Bloomberg, WSJ, CNBC
+• Federal Reserve rates
+• Crypto prices
+• Multi RE - Search all real estate sites
+
+TIPS:
 • Tap mode buttons to switch
 • Enter searches and tap Search
-• Use Tax GIS for property taxes`);
+• Use Tax GIS for property taxes
+• Multi RE searches 4 real estate sites`);
         }
 
         function showAbout() {
