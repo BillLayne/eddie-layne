@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#667eea">
+    <title>Universal Search Tool - Mobile</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+            padding: 0;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 100%;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* Mobile-First Header */
+        .header {
+            text-align: center;
+            padding: 20px 15px 15px;
+            color: white;
+            background: rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.95;
+        }
+
+        /* Mobile-Optimized Search Card */
+        .search-card {
+            background: white;
+            border-radius: 20px 20px 0 0;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.2);
+            padding: 20px 15px 25px;
+            min-height: calc(100vh - 90px);
+            min-height: calc(-webkit-fill-available - 90px);
+            position: relative;
+        }
+
+        .search-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+            border-radius: 20px 20px 0 0;
+        }
+
+        /* Pull Handle for mobile */
+        .pull-handle {
+            width: 40px;
+            height: 4px;
+            background: #cbd5e0;
+            border-radius: 2px;
+            margin: 0 auto 20px;
+        }
+
+        /* Mobile-Optimized Mode Selector */
+        .mode-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .mode-btn {
+            border: 2px solid #e2e8f0;
+            background: #ffffff;
+            color: #64748b;
+            border-radius: 12px;
+            padding: 12px 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            font-size: 11px;
+            min-height: 60px;
+            position: relative;
+            overflow: hidden;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .mode-btn i {
+            font-size: 18px;
+        }
+
+        .mode-btn:active {
+            transform: scale(0.95);
+        }
+
+        .mode-btn.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Mobile-Optimized Search Input */
+        .search-container {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .search-input {
+            width: 100%;
+            border: 2px solid #e2e8f0;
+            background: #f8fafc;
+            border-radius: 14px;
+            padding: 16px 15px;
+            font-size: 16px; /* Prevents zoom on iOS */
+            outline: none;
+            transition: all 0.2s;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .search-input:focus {
+            border-color: #667eea;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        /* Mobile-Optimized Action Buttons */
+        .search-actions {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            padding: 16px 20px;
+            border-radius: 12px;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 16px;
+            min-height: 52px;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            grid-column: span 2;
+        }
+
+        .btn-secondary {
+            background: #f8fafc;
+            color: #1e293b;
+            border: 2px solid #e2e8f0;
+        }
+
+        /* Mobile-Optimized Quick Actions */
+        .quick-actions {
+            border-top: 1px solid #e2e8f0;
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+
+        .quick-actions-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        .quick-action-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .quick-btn {
+            background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 14px 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+            color: #1e293b;
+            font-size: 12px;
+            font-weight: 500;
+            min-height: 70px;
+            text-align: center;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .quick-btn:active {
+            transform: scale(0.95);
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .quick-btn i {
+            font-size: 20px;
+            margin-bottom: 2px;
+        }
+
+        /* Mobile-Optimized Stats */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            margin-top: 2px;
+        }
+
+        /* Hide footer on mobile */
+        .footer {
+            display: none;
+        }
+
+        /* Mobile Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            align-items: flex-end;
+            justify-content: center;
+            z-index: 1000;
+            padding: 0;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px 20px 0 0;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.3);
+            padding: 25px 20px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .modal-header {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-body {
+            margin-bottom: 20px;
+            color: #64748b;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .modal-footer {
+            display: grid;
+            gap: 10px;
+        }
+
+        .modal-footer .btn {
+            width: 100%;
+        }
+
+        /* Swipe indicator */
+        .swipe-hint {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            z-index: 100;
+            animation: fadeInOut 3s ease;
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        /* Desktop adjustments */
+        @media (min-width: 769px) {
+            .container {
+                max-width: 900px;
+                margin: 0 auto;
+                padding: 20px;
+            }
+
+            .header {
+                background: transparent;
+                padding: 30px 20px;
+            }
+
+            .header h1 {
+                font-size: 48px;
+                margin-bottom: 10px;
+            }
+
+            .header p {
+                font-size: 18px;
+            }
+
+            .search-card {
+                border-radius: 20px;
+                padding: 40px;
+                min-height: auto;
+                margin: 0;
+                box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            }
+
+            .pull-handle {
+                display: none;
+            }
+
+            .mode-selector {
+                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+                gap: 12px;
+                margin-bottom: 30px;
+            }
+
+            .mode-btn {
+                flex-direction: row;
+                padding: 14px 16px;
+                font-size: 14px;
+                min-height: auto;
+            }
+
+            .search-actions {
+                grid-template-columns: repeat(3, 1fr);
+                margin-bottom: 25px;
+            }
+
+            .btn-primary {
+                grid-column: span 1;
+            }
+
+            .btn {
+                font-size: 15px;
+                padding: 14px 24px;
+                min-height: auto;
+            }
+
+            .quick-action-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 12px;
+            }
+
+            .quick-btn {
+                flex-direction: row;
+                padding: 12px 16px;
+                font-size: 14px;
+                min-height: auto;
+            }
+
+            .stats-row {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 12px;
+            }
+
+            .footer {
+                display: block;
+                text-align: center;
+                margin-top: 30px;
+                color: white;
+                font-size: 14px;
+                opacity: 0.9;
+            }
+
+            .footer a {
+                color: white;
+                text-decoration: none;
+                font-weight: 600;
+            }
+
+            .modal-content {
+                border-radius: 16px;
+                max-width: 500px;
+                max-height: 90vh;
+                animation: modalIn 0.3s ease;
+            }
+
+            @keyframes modalIn {
+                from { opacity: 0; transform: scale(0.9); }
+                to { opacity: 1; transform: scale(1); }
+            }
+
+            .modal {
+                align-items: center;
+                padding: 20px;
+            }
+
+            .modal-footer {
+                display: flex;
+                justify-content: flex-end;
+            }
+
+            .modal-footer .btn {
+                width: auto;
+            }
+        }
+
+        /* iOS Safe Area */
+        @supports (padding: max(0px)) {
+            .search-card {
+                padding-bottom: max(25px, env(safe-area-inset-bottom));
+            }
+            
+            .modal-content {
+                padding-bottom: max(25px, env(safe-area-inset-bottom));
+            }
+        }
+
+        /* Landscape mode adjustments for mobile */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .header {
+                padding: 10px 15px;
+            }
+
+            .header h1 {
+                font-size: 20px;
+            }
+
+            .mode-selector {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 6px;
+                margin-bottom: 15px;
+            }
+
+            .mode-btn {
+                padding: 10px 6px;
+                min-height: 50px;
+            }
+
+            .quick-action-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .stats-row {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        /* Loading state */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Touch feedback */
+        .touchable {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .touchable::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .touchable:active::after {
+            width: 300px;
+            height: 300px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Compact Mobile Header -->
+        <div class="header">
+            <h1>🔍 Universal Search</h1>
+            <p>All research tools in one place</p>
+        </div>
+
+        <!-- Mobile-First Search Card -->
+        <div class="search-card">
+            <div class="pull-handle"></div>
+            
+            <!-- Mode Selector - 2 rows of 3 -->
+            <div class="mode-selector" id="modeBar">
+                <button class="mode-btn touchable active" data-mode="web">
+                    <i class="fab fa-google"></i>
+                    <span>Web</span>
+                </button>
+                <button class="mode-btn touchable" data-mode="realestate">
+                    <i class="fas fa-home"></i>
+                    <span>Real Estate</span>
+                </button>
+                <button class="mode-btn touchable" data-mode="people">
+                    <i class="fas fa-user"></i>
+                    <span>People</span>
+                </button>
+                <button class="mode-btn touchable" data-mode="public">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Records</span>
+                </button>
+                <button class="mode-btn touchable" data-mode="stocks">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Stocks</span>
+                </button>
+                <button class="mode-btn touchable" data-mode="facebook">
+                    <i class="fab fa-facebook"></i>
+                    <span>Facebook</span>
+                </button>
+            </div>
+
+            <!-- Search Input -->
+            <div class="search-container">
+                <input 
+                    id="searchInput" 
+                    class="search-input" 
+                    placeholder="Search the web..." 
+                    autocomplete="off"
+                    inputmode="search"
+                    enterkeyhint="search"
+                />
+            </div>
+
+            <!-- Streamlined Action Buttons -->
+            <div class="search-actions">
+                <button class="btn btn-primary touchable" id="searchBtn">
+                    <i class="fas fa-search"></i> 
+                    <span>Search</span>
+                </button>
+                <button class="btn btn-secondary touchable" id="taxBtn" style="display: none;">
+                    <i class="fas fa-map-pin"></i>
+                    <span>Tax GIS</span>
+                </button>
+                <button class="btn btn-secondary touchable" id="clearBtn">
+                    <i class="fas fa-eraser"></i>
+                    <span>Clear</span>
+                </button>
+            </div>
+
+            <!-- Quick Actions Grid -->
+            <div class="quick-actions">
+                <div class="quick-actions-title">Quick Tools</div>
+                <div class="quick-action-grid">
+                    <a href="https://www.perplexity.ai/spaces/real-estate-property-researche-Ku3ClJ3OTJSn0EYXGbktmQ#0" 
+                       target="_blank" 
+                       class="quick-btn touchable">
+                        <i class="fas fa-brain"></i>
+                        <span>AI Property</span>
+                    </a>
+                    <button class="quick-btn touchable" onclick="quickFacebookSearch()">
+                        <i class="fab fa-facebook-f"></i>
+                        <span>FB People</span>
+                    </button>
+                    <button class="quick-btn touchable" onclick="openMultiSearch()">
+                        <i class="fas fa-layer-group"></i>
+                        <span>Multi-Tab</span>
+                    </button>
+                    <button class="quick-btn touchable" onclick="saveSearch()">
+                        <i class="fas fa-bookmark"></i>
+                        <span>Save</span>
+                    </button>
+                    <button class="quick-btn touchable" onclick="viewHistory()">
+                        <i class="fas fa-history"></i>
+                        <span>History</span>
+                    </button>
+                    <button class="quick-btn touchable" onclick="quickLinkedInSearch()">
+                        <i class="fab fa-linkedin"></i>
+                        <span>LinkedIn</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Compact Statistics -->
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-value" id="searchCount">0</div>
+                    <div class="stat-label">Today</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="savedCount">0</div>
+                    <div class="stat-label">Saved</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="modeCount">6</div>
+                    <div class="stat-label">Modes</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="timeValue">--</div>
+                    <div class="stat-label">Last</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Desktop Footer -->
+        <div class="footer">
+            <p>Built with ❤️ for efficient research | <a href="#" onclick="showHelp()">Help</a> | <a href="#" onclick="showAbout()">About</a></p>
+        </div>
+    </div>
+
+    <!-- Mobile-Optimized Modal -->
+    <div class="modal" id="taxModal">
+        <div class="modal-content">
+            <div class="pull-handle" style="margin-bottom: 15px;"></div>
+            <div class="modal-header">
+                <i class="fas fa-map-marked-alt" style="color: #667eea;"></i>
+                Tax GIS Search
+            </div>
+            <div class="modal-body" id="taxModalBody">
+                <!-- Content will be dynamically inserted -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary touchable" id="openCountyBtn">
+                    <i class="fas fa-external-link-alt"></i> Open County Site
+                </button>
+                <button class="btn btn-secondary touchable" onclick="closeTaxModal()">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Swipe Hint -->
+    <div class="swipe-hint" id="swipeHint">Swipe down to close</div>
+
+    <script>
+        // Mobile-optimized search configurations
+        let searchMode = 'web';
+        const modeMeta = {
+            web: { 
+                placeholder: 'Search the web...', 
+                icon: 'fab fa-google',
+                showTax: false 
+            },
+            realestate: { 
+                placeholder: 'Enter property address...', 
+                icon: 'fas fa-home',
+                showTax: true 
+            },
+            people: { 
+                placeholder: 'Enter name or phone...', 
+                icon: 'fas fa-user',
+                showTax: false 
+            },
+            public: { 
+                placeholder: 'Enter property address...', 
+                icon: 'fas fa-file-alt',
+                showTax: false 
+            },
+            stocks: { 
+                placeholder: 'Enter stock symbol...', 
+                icon: 'fas fa-chart-line',
+                showTax: false 
+            },
+            facebook: { 
+                placeholder: 'Search Facebook...', 
+                icon: 'fab fa-facebook',
+                showTax: false 
+            }
+        };
+
+        // County Tax URLs
+        const countyTax = {
+            "mecklenburg": { name: "Mecklenburg County", url: "https://property.spatialest.com/nc/mecklenburg/" },
+            "wake": { name: "Wake County", url: "https://services.wake.gov/realestate/" },
+            "guilford": { name: "Guilford County", url: "https://guilford.county-taxes.com/public/search/property_address" },
+            "forsyth": { name: "Forsyth County", url: "https://gis.forsyth.cc/parcelviewer/" },
+            "durham": { name: "Durham County", url: "https://property.durhamtax.com/" },
+            "orange": { name: "Orange County", url: "https://orange.county-taxes.com/public/search/property_address" },
+            "buncombe": { name: "Buncombe County", url: "https://buncombe.county-taxes.com/public/search/property_address" },
+            "cabarrus": { name: "Cabarrus County", url: "https://tax.cabarruscounty.us/" },
+            "gaston": { name: "Gaston County", url: "https://gaston.county-taxes.com/public/search/property_address" },
+            "union": { name: "Union County", url: "https://www.co.union.nc.us/departments/tax_administration/real_estate_search.php" },
+            "surry": { name: "Surry County", url: "http://www.gis.surryinfo.net/" },
+            "yadkin": { name: "Yadkin County", url: "https://www.bttaxpayerportal.com/ITSPublicYK/" },
+            "wilkes": { name: "Wilkes County", url: "https://wilkes.county-taxes.com/public/search/property_address" }
+        };
+
+        // City to County mapping
+        const cityToCounty = {
+            "charlotte": "mecklenburg",
+            "raleigh": "wake",
+            "greensboro": "guilford",
+            "winston-salem": "forsyth",
+            "durham": "durham",
+            "chapel hill": "orange",
+            "asheville": "buncombe",
+            "concord": "cabarrus",
+            "gastonia": "gaston",
+            "monroe": "union",
+            "elkin": "surry",
+            "mount airy": "surry",
+            "yadkinville": "yadkin",
+            "wilkesboro": "wilkes"
+        };
+
+        // Initialize with vibration feedback for mobile
+        function init() {
+            loadStats();
+            
+            // Set up event listeners with haptic feedback
+            document.querySelectorAll('#modeBar button').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    vibrate(10);
+                    setMode(btn.dataset.mode);
+                });
+            });
+
+            document.getElementById('searchBtn').addEventListener('click', () => {
+                vibrate(20);
+                performSearch();
+            });
+
+            document.getElementById('searchInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    vibrate(20);
+                    performSearch();
+                }
+            });
+
+            document.getElementById('clearBtn').addEventListener('click', () => {
+                vibrate(10);
+                clearSearch();
+            });
+
+            document.getElementById('taxBtn').addEventListener('click', () => {
+                vibrate(15);
+                openTaxModal();
+            });
+
+            // Touch feedback for buttons
+            document.querySelectorAll('.touchable').forEach(elem => {
+                elem.addEventListener('touchstart', () => vibrate(5));
+            });
+
+            // Swipe to dismiss modal
+            setupSwipeGestures();
+            
+            updateTime();
+            setInterval(updateTime, 60000);
+
+            // Show first-time hint
+            if (!localStorage.getItem('seenHint')) {
+                setTimeout(() => {
+                    localStorage.setItem('seenHint', 'true');
+                }, 3000);
+            }
+        }
+
+        // Vibration helper
+        function vibrate(duration) {
+            if ('vibrate' in navigator) {
+                navigator.vibrate(duration);
+            }
+        }
+
+        // Swipe gestures for modal
+        function setupSwipeGestures() {
+            let startY = 0;
+            let currentY = 0;
+            const modal = document.querySelector('.modal-content');
+            
+            if (!modal) return;
+
+            modal.addEventListener('touchstart', (e) => {
+                startY = e.touches[0].clientY;
+            });
+
+            modal.addEventListener('touchmove', (e) => {
+                currentY = e.touches[0].clientY;
+                const diff = currentY - startY;
+                
+                if (diff > 0) {
+                    modal.style.transform = `translateY(${diff}px)`;
+                }
+            });
+
+            modal.addEventListener('touchend', () => {
+                const diff = currentY - startY;
+                
+                if (diff > 100) {
+                    closeTaxModal();
+                } else {
+                    modal.style.transform = 'translateY(0)';
+                }
+                
+                startY = 0;
+                currentY = 0;
+            });
+        }
+
+        // Set search mode
+        function setMode(mode) {
+            searchMode = mode;
+            
+            document.querySelectorAll('#modeBar button').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.mode === mode);
+            });
+
+            const input = document.getElementById('searchInput');
+            input.placeholder = modeMeta[mode].placeholder;
+            
+            document.getElementById('taxBtn').style.display = 
+                modeMeta[mode].showTax ? 'flex' : 'none';
+            
+            // Update search button layout
+            const searchBtn = document.getElementById('searchBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            
+            if (modeMeta[mode].showTax) {
+                searchBtn.style.gridColumn = 'span 1';
+            } else {
+                searchBtn.style.gridColumn = 'span 2';
+            }
+            
+            input.focus();
+        }
+
+        // Perform search with loading state
+        function performSearch() {
+            const query = document.getElementById('searchInput').value.trim();
+            if (!query) {
+                vibrate([50, 50, 50]); // Error vibration pattern
+                alert('Please enter a search term');
+                return;
+            }
+
+            updateSearchCount();
+            saveToHistory(searchMode, query);
+
+            let url = '';
+            
+            switch(searchMode) {
+                case 'web':
+                    url = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+                    break;
+                case 'realestate':
+                    url = `https://www.zillow.com/homes/${encodeURIComponent(query)}_rb/`;
+                    break;
+                case 'people':
+                    url = `https://www.truepeoplesearch.com/results?name=${encodeURIComponent(query)}`;
+                    break;
+                case 'public':
+                    url = `https://www.pubrecord.org/property-records/?search=${encodeURIComponent(query)}`;
+                    break;
+                case 'stocks':
+                    url = `https://finance.yahoo.com/quote/${encodeURIComponent(query.toUpperCase())}`;
+                    break;
+                case 'facebook':
+                    url = `https://www.facebook.com/search/top?q=${encodeURIComponent(query)}`;
+                    break;
+            }
+
+            if (url) {
+                window.open(url, '_blank');
+                document.getElementById('searchInput').value = '';
+                vibrate(50); // Success vibration
+            }
+        }
+
+        // Clear search
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('searchInput').focus();
+        }
+
+        // Tax Modal Functions
+        function guessCounty(address) {
+            const addr = address.toLowerCase();
+            
+            for (const [city, county] of Object.entries(cityToCounty)) {
+                if (addr.includes(city)) return county;
+            }
+            
+            for (const county of Object.keys(countyTax)) {
+                if (addr.includes(county)) return county;
+            }
+            
+            return null;
+        }
+
+        function openTaxModal() {
+            const address = document.getElementById('searchInput').value.trim();
+            if (!address) {
+                vibrate([50, 50, 50]);
+                alert('Please enter an address first');
+                document.getElementById('searchInput').focus();
+                return;
+            }
+
+            const county = guessCounty(address);
+            const modal = document.getElementById('taxModal');
+            const body = document.getElementById('taxModalBody');
+            const openBtn = document.getElementById('openCountyBtn');
+
+            if (county && countyTax[county]) {
+                body.innerHTML = `
+                    <p><strong>Address:</strong><br>${address}</p>
+                    <p><strong>County:</strong><br>${countyTax[county].name}</p>
+                    <p style="margin-top: 15px; color: #667eea;">
+                        <i class="fas fa-info-circle"></i> 
+                        Tap "Open County Site" to access tax records.
+                    </p>
+                `;
+                
+                openBtn.onclick = () => {
+                    vibrate(20);
+                    window.open(countyTax[county].url, '_blank');
+                    closeTaxModal();
+                };
+                openBtn.disabled = false;
+            } else {
+                body.innerHTML = `
+                    <p><strong>Address:</strong><br>${address}</p>
+                    <p style="color: #ef4444; margin-top: 15px;">
+                        <i class="fas fa-exclamation-triangle"></i> 
+                        Could not determine county.
+                    </p>
+                    <p style="margin-top: 10px;">
+                        Include city name or county in NC.
+                    </p>
+                `;
+                openBtn.disabled = true;
+            }
+
+            modal.classList.add('active');
+            
+            // Show swipe hint on mobile
+            if (window.innerWidth <= 768) {
+                const hint = document.getElementById('swipeHint');
+                hint.style.display = 'block';
+                setTimeout(() => {
+                    hint.style.display = 'none';
+                }, 3000);
+            }
+        }
+
+        function closeTaxModal() {
+            const modal = document.getElementById('taxModal');
+            const modalContent = modal.querySelector('.modal-content');
+            modalContent.style.transform = 'translateY(0)';
+            modal.classList.remove('active');
+            vibrate(10);
+        }
+
+        // Multi-tab search
+        function openMultiSearch() {
+            const query = document.getElementById('searchInput').value.trim();
+            if (!query) {
+                vibrate([50, 50, 50]);
+                alert('Enter a search term first');
+                return;
+            }
+
+            const searches = [
+                `https://www.google.com/search?q=${encodeURIComponent(query)}`,
+                `https://www.facebook.com/search/top?q=${encodeURIComponent(query)}`,
+                `https://www.truepeoplesearch.com/results?name=${encodeURIComponent(query)}`
+            ];
+
+            searches.forEach(url => window.open(url, '_blank'));
+            updateSearchCount(searches.length);
+            vibrate([20, 50, 20]);
+        }
+
+        // Quick Facebook People Search
+        function quickFacebookSearch() {
+            const query = document.getElementById('searchInput').value.trim();
+            if (!query) {
+                setMode('facebook');
+                document.getElementById('searchInput').placeholder = 'Enter name to search...';
+                document.getElementById('searchInput').focus();
+                vibrate(10);
+                return;
+            }
+            
+            const url = `https://www.facebook.com/search/people/?q=${encodeURIComponent(query)}`;
+            window.open(url, '_blank');
+            updateSearchCount();
+            saveToHistory('facebook-people', query);
+            vibrate(20);
+        }
+
+        // Quick LinkedIn Search
+        function quickLinkedInSearch() {
+            const query = document.getElementById('searchInput').value.trim();
+            if (!query) {
+                vibrate([50, 50, 50]);
+                alert('Enter a name first');
+                document.getElementById('searchInput').focus();
+                return;
+            }
+            
+            const url = `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(query)}`;
+            window.open(url, '_blank');
+            updateSearchCount();
+            saveToHistory('linkedin', query);
+            vibrate(20);
+        }
+
+        // Save search
+        function saveSearch() {
+            const query = document.getElementById('searchInput').value.trim();
+            if (!query) {
+                vibrate([50, 50, 50]);
+                alert('Enter a search term to save');
+                return;
+            }
+
+            let savedSearches = JSON.parse(localStorage.getItem('savedSearches') || '[]');
+            savedSearches.unshift({
+                mode: searchMode,
+                query: query,
+                date: new Date().toISOString()
+            });
+            
+            savedSearches = savedSearches.slice(0, 50);
+            localStorage.setItem('savedSearches', JSON.stringify(savedSearches));
+            
+            updateSavedCount();
+            vibrate([20, 50, 20]);
+            alert('Search saved! ✓');
+        }
+
+        // View history - mobile optimized
+        function viewHistory() {
+            const history = JSON.parse(localStorage.getItem('searchHistory') || '[]');
+            
+            if (history.length === 0) {
+                alert('No search history yet');
+                return;
+            }
+            
+            const recent = history.slice(0, 10);
+            let message = 'Recent Searches:\n\n';
+            
+            recent.forEach((item, index) => {
+                const time = new Date(item.date);
+                const timeStr = time.toLocaleTimeString('en-US', { 
+                    hour: 'numeric', 
+                    minute: '2-digit' 
+                });
+                message += `${index + 1}. ${item.query}\n   (${item.mode} - ${timeStr})\n\n`;
+            });
+            
+            alert(message);
+            vibrate(10);
+        }
+
+        // Statistics functions
+        function updateSearchCount(increment = 1) {
+            let count = parseInt(localStorage.getItem('searchesToday') || '0');
+            count += increment;
+            localStorage.setItem('searchesToday', count);
+            localStorage.setItem('lastSearchTime', new Date().toISOString());
+            document.getElementById('searchCount').textContent = count;
+            updateTime();
+        }
+
+        function updateSavedCount() {
+            const saved = JSON.parse(localStorage.getItem('savedSearches') || '[]');
+            document.getElementById('savedCount').textContent = saved.length;
+        }
+
+        function updateTime() {
+            const lastTime = localStorage.getItem('lastSearchTime');
+            if (lastTime) {
+                const date = new Date(lastTime);
+                const now = new Date();
+                const diff = Math.floor((now - date) / 60000);
+                
+                if (diff < 1) {
+                    document.getElementById('timeValue').textContent = 'Now';
+                } else if (diff < 60) {
+                    document.getElementById('timeValue').textContent = `${diff}m`;
+                } else if (diff < 1440) {
+                    document.getElementById('timeValue').textContent = `${Math.floor(diff/60)}h`;
+                } else {
+                    document.getElementById('timeValue').textContent = `${Math.floor(diff/1440)}d`;
+                }
+            }
+        }
+
+        function saveToHistory(mode, query) {
+            let history = JSON.parse(localStorage.getItem('searchHistory') || '[]');
+            history.unshift({
+                mode: mode,
+                query: query,
+                date: new Date().toISOString()
+            });
+            history = history.slice(0, 100);
+            localStorage.setItem('searchHistory', JSON.stringify(history));
+        }
+
+        function loadStats() {
+            const today = new Date().toDateString();
+            const lastReset = localStorage.getItem('lastResetDate');
+            
+            if (lastReset !== today) {
+                localStorage.setItem('searchesToday', '0');
+                localStorage.setItem('lastResetDate', today);
+            }
+            
+            const searches = parseInt(localStorage.getItem('searchesToday') || '0');
+            document.getElementById('searchCount').textContent = searches;
+            
+            updateSavedCount();
+        }
+
+        // Mobile-friendly help
+        function showHelp() {
+            alert(`Universal Search Tool
+
+Search Modes:
+• Web - Google search
+• Real Estate - Zillow + Tax GIS
+• People - TruePeopleSearch
+• Records - Public property records
+• Stocks - Yahoo Finance
+• Facebook - Social search
+
+Quick Tools:
+• AI Property - Perplexity research
+• FB People - Facebook people search
+• Multi-Tab - Open multiple searches
+• LinkedIn - Professional search
+
+Tips:
+• Tap mode buttons to switch
+• Enter searches and tap Search
+• Use Tax GIS for property taxes`);
+        }
+
+        function showAbout() {
+            alert(`Universal Search Tool
+Mobile-Optimized v2.0
+
+A powerful multi-mode search tool designed for mobile efficiency.
+
+Built for professional research.`);
+        }
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', init);
+
+        // Handle escape key and back button
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeTaxModal();
+            }
+        });
+
+        // Prevent pull-to-refresh on mobile
+        let lastY = 0;
+        document.addEventListener('touchstart', (e) => {
+            lastY = e.touches[0].clientY;
+        });
+
+        document.addEventListener('touchmove', (e) => {
+            const y = e.touches[0].clientY;
+            const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+            
+            if (scrollTop === 0 && y > lastY) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        // Add to home screen prompt
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+        });
+
+        // Service worker for offline capability (optional)
+        if ('serviceWorker' in navigator && window.location.protocol === 'https:') {
+            navigator.serviceWorker.register('sw.js').catch(() => {});
+        }
+    </script>
+</body>
+</html>
